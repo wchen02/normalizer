@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/wchen02/normalizer#readme",
   "devDependencies": {
+    "eslint": "^6.1.0",
     "generate-changelog": "^1.8.0"
   },
   "dependencies": {
