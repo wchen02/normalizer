@@ -21,5 +21,9 @@
   "homepage": "https://github.com/wchen02/normalizer#readme",
   "devDependencies": {
     "generate-changelog": "^1.8.0"
+  },
+  "dependencies": {
+    "download": "^7.1.0",
+    "load-json-file": "^6.2.0"
   }
 }
