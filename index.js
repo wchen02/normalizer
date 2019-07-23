@@ -80,21 +80,22 @@ async function processFile(filename) {
 
 async function main() {
     log.setLevel(process.env.LOG_LEVEL);
-    const readdirAsync = promisify(fs.readdir)
-
-    let files;
-
-    try {
-        log.info(`Scaning data directory ${DATA_DIR}`);
-        files = await readdirAsync(DATA_DIR);
-        log.info(`Found ${files.length} data files.`);
-    } catch (err) {
-        return log.error('Unable to scan directory: ' + err);
-    }
 
     if (process.env.DEVELOPMENT) {
         processFile('example.json');
     } else {
+        const readdirAsync = promisify(fs.readdir)
+
+        let files;
+    
+        try {
+            log.info(`Scaning data directory ${DATA_DIR}`);
+            files = await readdirAsync(DATA_DIR);
+            log.info(`Found ${files.length} data files.`);
+        } catch (err) {
+            return log.error('Unable to scan directory: ' + err);
+        }
+
         await Promise.all(files.map(filename => {
             processFile(filename);
         }));
