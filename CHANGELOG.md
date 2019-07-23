@@ -1,3 +1,9 @@
+### 0.2.0 (2019-07-23)
+
+##### New Features
+
+*  Reads data dir and downloads galleries of all data files ([f25e1d30](https://github.com/wchen02/normalizer/commit/f25e1d3092c528b5ef15486a7037a8d668884690))
+
 ### 0.1.0 (2019-07-22)
 
 ##### Chores
