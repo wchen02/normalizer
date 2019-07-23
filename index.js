@@ -1,4 +1,7 @@
 const fs = require('fs');
+const fileType = require('file-type');
+const stream = require('stream');
+
 const { promisify } = require('util')
 const download = require('download');
 const loadJsonFile = require('load-json-file');
@@ -13,12 +16,27 @@ const getDataFile = (filename) => DATA_DIR + filename;
 async function downloadDataFileGallery(dataFilename) {
     const jsonFilePath = getDataFile(dataFilename);
     const data = await loadJsonFile(jsonFilePath);
+
     if (data.gallery.length) {
-        await Promise.all(data.gallery.map(imgUrl => {
-            const filename = uuid() + '.jpeg';
-            const uniqueId = data.url.replace(/[:\\/]/g, '_').toLowerCase();
-            mkdirp.sync(DOWNLOAD_DIR + uniqueId);
-            download(imgUrl).pipe(fs.createWriteStream(DOWNLOAD_DIR + uniqueId + '/' + filename));
+        await Promise.all(data.gallery.map(async (imgUrl) => {
+            // mkdir with ':' and '/' chars replaced to '_'
+            const galleryPath = DOWNLOAD_DIR + data.url.replace(/[:\\/]/g, '_').toLowerCase();
+            mkdirp.sync(galleryPath);
+            
+            const fileData = await download(imgUrl);
+            const fileDataType = fileType(fileData);
+
+            if (!fileDataType) {
+                console.warn('Invalid filetype, skipping.');
+                return;
+            }
+
+            if (fileDataType.mime.includes('image/')) {
+                const writeFileAsync = promisify(fs.writeFile);
+                const filename = uuid() + '.' + fileDataType.ext;
+                writeFileAsync(galleryPath + '/' + filename, fileData);
+                console.log(`Downloaded ${filename}`);
+            }
         }));
     }
 }
@@ -34,9 +52,7 @@ async function main() {
         return console.error('Unable to scan directory: ' + err);
     }
 
-    files.forEach(async (file) => {
-        await downloadDataFileGallery(file);
-    });
+    await Promise.all(files.map(file => downloadDataFileGallery(file)));
 }
 
 main();
