@@ -1,3 +1,11 @@
+### 0.3.0 (2019-07-23)
+
+##### New Features
+
+*  Parse phone number from details if not present. maintain a transformed data object to be written to disk later, enable development mode ([a2d7d4a9](https://github.com/wchen02/normalizer/commit/a2d7d4a9cd7064120c4f81f201da2b82487ae153))
+*  Add hiding log based on log level set in ENV, add clean script ([8cb807b1](https://github.com/wchen02/normalizer/commit/8cb807b18fdd6240a313ba696fa21b00a05aff52))
+*  detect filetype and only save images to disk ([d2dab8ee](https://github.com/wchen02/normalizer/commit/d2dab8ee9f7385f83425cef08a100c956abc3b13))
+
 ### 0.2.0 (2019-07-23)
 
 ##### New Features
