@@ -4,7 +4,7 @@ const fileType = require('file-type');
 const log = require('loglevel');
 const { promisify } = require('util')
 const download = require('download');
-const loadJsonFile = require('load-json-file');
+const jsonfile = require('jsonfile');
 const mkdirp = require('mkdirp');
 const uuid = require('uuid/v4');
 
@@ -13,7 +13,13 @@ const DATA_DIR = 'data/';
 
 async function openFile(filename) {
     log.info(`Opening ${filename}`)
-    const dataJson = await loadJsonFile(filename);
+    let dataJson;
+    try {
+        dataJson = await jsonfile.readFile(filename);
+    } catch (err) {
+        log.error(`Error opening file: "${filename}"`);
+        log.error(err);
+    }
     log.info(JSON.stringify(dataJson));
     return dataJson;
 }
@@ -69,13 +75,11 @@ async function processFile(filename) {
     const transformedDataJson = JSON.parse(JSON.stringify(dataJson));
     await Promise.all([
         downloadDataFileGallery(dataJson, transformedDataJson),
-        parsePhoneNumber(dataJson, transformedDataJson),
-        // parseEmail(dataJson),
-        // parseAddress(dataJson),
+        parsePhoneNumber(dataJson, transformedDataJson)
     ]);
 
     log.info(`Transformed Data JSON:\n ${JSON.stringify(transformedDataJson)}`);
-    return transformedDataJson;
+    // await writeFile(DATA_DIR + filename, transformedDataJson);
 }
 
 async function main() {
