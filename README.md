@@ -6,6 +6,7 @@ Normalizes data extracted with scraper. Normalizer will parse data json files an
 - Unique UUIDv4 image filename generation
 - Prevent malicious file downloads through image filetype detection
 - Parse phone number from details
+- Write transformed data into a separate file
 
 ## How to install
 `npm install`
@@ -21,6 +22,6 @@ Production mode scans all the data files inside data/. In this mode, you will on
 `npm run start-prod`
 
 ## Clean up
-You may run the following to clean up downloaded files:
+You may run the following to clean up downloaded files and normalized data files.
 
 `npm run clean`
