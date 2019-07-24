@@ -1,5 +1,5 @@
 node_modules/
-data/*
-!data/example.json
+data/*/*
+!data/*/example.json
 downloads/*
 !downloads/.gitkeep

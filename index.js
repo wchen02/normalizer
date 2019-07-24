@@ -10,6 +10,8 @@ const uuid = require('uuid/v4');
 
 const DOWNLOAD_DIR = 'downloads/';
 const DATA_DIR = 'data/';
+const RAW_DATA_DIR = DATA_DIR + 'raw/';
+const NORMALIZED_DATA_DIR = DATA_DIR + 'normalized/';
 
 async function openFile(filename) {
     log.info(`Opening ${filename}`)
@@ -21,6 +23,19 @@ async function openFile(filename) {
         log.error(err);
     }
     log.info(JSON.stringify(dataJson));
+    return dataJson;
+}
+
+async function writeFile(filename, dataJson) {
+    log.info(`Writing to ${filename}`)
+    log.info(`Transformed Data JSON:\n ${JSON.stringify(dataJson)}`);
+    try {
+        dataJson = await jsonfile.writeFile(filename, dataJson, { spaces: 2 });
+    } catch (err) {
+        log.error(`Error writting to file: "${filename}"`);
+        log.error(err);
+    }
+    log.info('Done');
     return dataJson;
 }
 
@@ -70,7 +85,7 @@ async function parsePhoneNumber(dataJson, transformedDataJson) {
 }
 
 async function processFile(filename) {
-    const dataJson = await openFile(DATA_DIR + filename);
+    const dataJson = await openFile(RAW_DATA_DIR + filename);
     // copied a new object out of dataJson
     const transformedDataJson = JSON.parse(JSON.stringify(dataJson));
     await Promise.all([
@@ -78,8 +93,7 @@ async function processFile(filename) {
         parsePhoneNumber(dataJson, transformedDataJson)
     ]);
 
-    log.info(`Transformed Data JSON:\n ${JSON.stringify(transformedDataJson)}`);
-    // await writeFile(DATA_DIR + filename, transformedDataJson);
+    await writeFile(NORMALIZED_DATA_DIR + filename, transformedDataJson);
 }
 
 async function main() {
@@ -93,8 +107,8 @@ async function main() {
         let files;
     
         try {
-            log.info(`Scaning data directory ${DATA_DIR}`);
-            files = await readdirAsync(DATA_DIR);
+            log.info(`Scaning data directory ${RAW_DATA_DIR}`);
+            files = await readdirAsync(RAW_DATA_DIR);
             log.info(`Found ${files.length} data files.`);
         } catch (err) {
             return log.error('Unable to scan directory: ' + err);
