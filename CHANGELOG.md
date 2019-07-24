@@ -1,3 +1,13 @@
+#### 0.4.1 (2019-07-24)
+
+##### Documentation Changes
+
+*  Update readme ([42d110ab](https://github.com/wchen02/normalizer/commit/42d110abfbccc223744d3c7b638f29b10141aa95))
+
+##### Bug Fixes
+
+*  Fix wrong log level in start-prod script ([03ab3f96](https://github.com/wchen02/normalizer/commit/03ab3f96131a85169a1b243d2b8afeaf2bd45cf1))
+
 ### 0.4.0 (2019-07-24)
 
 ##### Documentation Changes
