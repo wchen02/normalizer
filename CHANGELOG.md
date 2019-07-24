@@ -1,3 +1,21 @@
+### 0.4.0 (2019-07-24)
+
+##### Documentation Changes
+
+*  Update readme ([c2f2a3d6](https://github.com/wchen02/normalizer/commit/c2f2a3d6ec1960a459490b1cac181b2e163a4b5f))
+
+##### New Features
+
+*  Write transformed file to data dir, update clean script to clean normalized data dir as well ([e1ac48eb](https://github.com/wchen02/normalizer/commit/e1ac48eb264ac85941f16dfc6dabd420c382fd81))
+
+##### Performance Improvements
+
+*  avoid scanning data dir for development mode ([109749ea](https://github.com/wchen02/normalizer/commit/109749eaeacca188b6e45919ebaca6c4fe5bdc63))
+
+##### Refactors
+
+*  Refactor code to use jsonfile package. ([e59b9ffd](https://github.com/wchen02/normalizer/commit/e59b9ffde62da89f870a0313fd9fdc171791c7c6))
+
 ### 0.3.0 (2019-07-23)
 
 ##### New Features
