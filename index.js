@@ -157,6 +157,47 @@ function mapCategoryToId(dataJson, transformedDataJson) {
     delete transformedDataJson.category;
 }
 
+function mapCityToId(dataJson, transformedDataJson) {
+    const cityIdMap = {
+        'New York': 1
+    }
+    if (dataJson.city && cityIdMap[dataJson.city]) {
+        transformedDataJson.city_id = cityIdMap[dataJson.city];
+    } else {
+        transformedDataJson.city_id = 1;
+    }
+    delete transformedDataJson.city;
+}
+
+function mapAreaToId(dataJson, transformedDataJson) {
+    const areaIdMap = {
+        'Queens': 1,
+        'Elmhurst': 6,
+        'Brooklyn': 7,
+        'Manhattan': 8,
+        'Flushing': 5,
+        'Other': 10,
+    }
+    if (dataJson.area && areaIdMap[dataJson.area]) {
+        transformedDataJson.area_id = areaIdMap[dataJson.area];
+    } else {
+        transformedDataJson.area_id = 1;
+    }
+    delete transformedDataJson.area;
+}
+
+function mapSubareaToBusinessId(dataJson, transformedDataJson) {
+    const subareaToBusinessIdMap = {
+        'Flushing': 1
+    }
+    if (dataJson.subarea && subareaToBusinessIdMap[dataJson.subarea]) {
+        transformedDataJson.business_id = subareaToBusinessIdMap[dataJson.subarea];
+    } else {
+        transformedDataJson.business_id = 1;
+    }
+    delete transformedDataJson.subarea;
+}
+
 async function processFile(filename) {
     const dataJson = await openFile(RAW_DATA_DIR + filename);
     // copied a new object out of dataJson
@@ -165,6 +206,9 @@ async function processFile(filename) {
         downloadDataFileGallery(dataJson, transformedDataJson),
         parsePhoneNumber(dataJson, transformedDataJson),
         mapCategoryToId(dataJson, transformedDataJson),
+        mapCityToId(dataJson, transformedDataJson),
+        mapAreaToId(dataJson, transformedDataJson),
+        mapSubareaToBusinessId(dataJson, transformedDataJson),
     ]);
 
     await writeFile(NORMALIZED_DATA_DIR + filename, transformedDataJson);
