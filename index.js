@@ -218,6 +218,42 @@ function addMissingDefaultFields(dataJson, transformedDataJson) {
     if (!dataJson.top_date) {
         transformedDataJson.top_date = formattedDate;
     }
+    if (!dataJson.text1) {
+        transformedDataJson.text1 = null;
+    }
+    if (!dataJson.text2) {
+        transformedDataJson.text2 = null;
+    }
+    if (!dataJson.text3) {
+        transformedDataJson.text3 = null;
+    }
+    if (!dataJson.num1) {
+        transformedDataJson.num1 = null;
+    }
+    if (!dataJson.num2) {
+        transformedDataJson.num2 = null;
+    }
+    if (!dataJson.select1) {
+        transformedDataJson.select1 = null;
+    }
+    if (!dataJson.select2) {
+        transformedDataJson.select2 = null;
+    }
+    if (!dataJson.select3) {
+        transformedDataJson.select3 = null;
+    }
+    if (!dataJson.select4) {
+        transformedDataJson.select4 = null;
+    }
+    if (!dataJson.select5) {
+        transformedDataJson.select5 = null;
+    }
+    if (!dataJson.audit) {
+        transformedDataJson.audit = 1;
+    }
+    if (!dataJson.user_id) {
+        transformedDataJson.user_id = 2;
+    }
 }
 
 async function processFile(filename) {
