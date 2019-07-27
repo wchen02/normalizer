@@ -9,77 +9,108 @@ const mkdirp = require('mkdirp');
 const uuid = require('uuid/v4');
 const { format, getTime } = require('date-fns');
 
-const DOWNLOAD_DIR = 'downloads/';
+const DOWNLOAD_DIR = 'attachs/';
 const DATA_DIR = 'data/';
 const RAW_DATA_DIR = DATA_DIR + 'raw/';
 const NORMALIZED_DATA_DIR = DATA_DIR + 'normalized/';
 
 async function openFile(filename) {
-    log.info(`Opening ${filename}`)
+    log.info(`Opening ${ filename }`)
     let dataJson;
     try {
         dataJson = await jsonfile.readFile(filename);
     } catch (err) {
-        log.error(`Error opening file: "${filename}"`);
+        log.error(`Error opening file: "${ filename }"`);
         log.error(err);
     }
-    log.info(JSON.stringify(dataJson));
+    log.debug(JSON.stringify(dataJson));
     return dataJson;
 }
 
 async function writeFile(filename, dataJson) {
-    log.info(`Writing Transformed Data JSON to ${filename}`)
-    log.info(JSON.stringify(dataJson));
+    log.info(`Writing Transformed Data JSON to ${ filename }`)
+    log.debug(JSON.stringify(dataJson));
     try {
         dataJson = await jsonfile.writeFile(filename, dataJson, { spaces: 2 });
     } catch (err) {
-        log.error(`Error writting to file: "${filename}"`);
+        log.error(`Error writting to file: "${ filename }"`);
         log.error(err);
     }
-    log.info('Done');
+    log.debug('Done');
     return dataJson;
 }
 
-async function downloadDataFileGallery(dataJson, transformedDataJson) {
+async function downloadImage(dataJson, imgUrl) {
+    if (!imgUrl) {
+        return;
+    }
+
+    const date = new Date(dataJson.date);
+    const year = format(date, 'YYYY');
+    const month = format(date, 'MM');
+    const day = format(date, 'DD');
+
+    const attachsDir = DOWNLOAD_DIR + year + '/' + month + '/' + day + '/';
+    log.info(`Making directory ${ attachsDir }`);
+    try {
+        mkdirp.sync(attachsDir);
+    } catch (err) {
+        log.error(`Error to make dir ${ attachsDir }`);
+        log.error(err);
+    }
+    
+    log.info(`Download image ${ imgUrl }`);
+    let fileData;
+    try {
+        fileData = await download(imgUrl);
+    } catch (err) {
+        log.error(`Error downloading image ${ imgUrl }`);
+        log.error(err);
+    }
+
+    const fileDataType = fileType(fileData);
+    if (!fileDataType || !fileDataType.mime.includes('image/')) {
+        log.warn('Invalid filetype, skipping.');
+        return;
+    }
+
+    const writeFileAsync = promisify(fs.writeFile);
+    const filename = attachsDir + uuid() + '.' + fileDataType.ext;
+    try {
+        writeFileAsync(filename, fileData);
+    } catch (err) {
+        log.error(`Error writing file ${ filename }`);
+        log.error(err);
+    }
+    log.debug(`Downloaded to ${ filename }`);
+
+    return filename;
+}
+
+async function downloadThumbnailImage(dataJson, imgUrl) {
+    downloadImage(dataJson, dataJson.photo);
+}
+
+async function downloadGalleryImages(dataJson, transformedDataJson) {
     if (!dataJson.gallery.length) {
         return;
     }
 
-    log.info(`Found ${dataJson.gallery.length} gallery images`);
-    const newGalleryPaths = [];
-    await Promise.all(dataJson.gallery.map(async (imgUrl) => {
-        // mkdir with ':' and '/' chars replaced to '_'
-        const galleryPath = DOWNLOAD_DIR + dataJson.url.replace(/[:\\/]/g, '_').toLowerCase();
-        log.info(`Making directory ${galleryPath}`);
-        mkdirp.sync(galleryPath);
-        
-        log.info(`Download image ${imgUrl}`);
-        const fileData = await download(imgUrl);
-        const fileDataType = fileType(fileData);
-
-        if (!fileDataType) {
-            log.warn('Invalid filetype, skipping.');
-            return;
-        }
-
-        if (fileDataType.mime.includes('image/')) {
-            const writeFileAsync = promisify(fs.writeFile);
-            const filename = galleryPath + '/' + uuid() + '.' + fileDataType.ext;
-            writeFileAsync(filename, fileData);
-            newGalleryPaths.push(filename);
-            log.log(`Downloaded to ${filename}`);
-        }
+    log.info(`Found ${ dataJson.gallery.length } gallery images`);
+    const newGalleryPaths = await Promise.all(dataJson.gallery.map(async (imgUrl) => {
+        return downloadImage(dataJson, imgUrl);
     }));
+    log.debug(newGalleryPaths);
 
     transformedDataJson.gallery = newGalleryPaths;
 }
 
 async function parsePhoneNumber(dataJson, transformedDataJson) {
     if (!dataJson.contact_phone) {
-        log.info('Parseing phone number');
+        log.info('Parsing phone number');
         const phoneNumber = findNumbers(dataJson.details, 'US', { v2: true });
         if (phoneNumber.length) {
-            log.info(`Found ${phoneNumber[0].number.nationalNumber}`);
+            log.debug(`Found ${ phoneNumber[0].number.nationalNumber }`);
             transformedDataJson.contact_phone = phoneNumber[0].number.nationalNumber;
         }
     }
@@ -155,6 +186,8 @@ function mapCategoryToId(dataJson, transformedDataJson) {
     } else {
         transformedDataJson.cate_id = 147
     }
+
+    log.info(`Mapped category ${ dataJson.category } to ${ transformedDataJson.cate_id }`);
     delete transformedDataJson.category;
 }
 
@@ -167,6 +200,8 @@ function mapCityToId(dataJson, transformedDataJson) {
     } else {
         transformedDataJson.city_id = 1;
     }
+
+    log.info(`Mapped city ${ dataJson.city } to ${ transformedDataJson.city_id }`);
     delete transformedDataJson.city;
 }
 
@@ -184,6 +219,8 @@ function mapAreaToId(dataJson, transformedDataJson) {
     } else {
         transformedDataJson.area_id = 1;
     }
+
+    log.info(`Mapped area ${ dataJson.area } to ${ transformedDataJson.area_id }`);
     delete transformedDataJson.area;
 }
 
@@ -196,6 +233,8 @@ function mapSubareaToBusinessId(dataJson, transformedDataJson) {
     } else {
         transformedDataJson.business_id = 1;
     }
+
+    log.info(`Mapped subarea ${ dataJson.subarea } to ${ transformedDataJson.business_id }`);
     delete transformedDataJson.subarea;
 }
 
@@ -205,13 +244,14 @@ function convertDateToUnixTimestamp(dataJson, transformedDataJson) {
     }
     const date = new Date(dataJson.date);
     const unixTimestamp = getTime(date)/1000;
-    log.info(`Converted ${dataJson.date} to ${unixTimestamp}`);
+    log.info(`Converted ${ dataJson.date } to ${ unixTimestamp }`);
     transformedDataJson.date = unixTimestamp;
 }
 
 function addMissingDefaultFields(dataJson, transformedDataJson) {
-    const now = new Date();
-    const formattedDate = format(now, 'YYYY-MM-DD');
+    const date = dataJson.date ? new Date(dataJson.date) : new Date();
+    const formattedDate = format(date, 'YYYY-MM-DD');
+
     if (!dataJson.urgent_date) {
         transformedDataJson.urgent_date = formattedDate;
     }
@@ -257,21 +297,27 @@ function addMissingDefaultFields(dataJson, transformedDataJson) {
 }
 
 async function processFile(filename) {
-    const dataJson = await openFile(RAW_DATA_DIR + filename);
-    // copied a new object out of dataJson
-    const transformedDataJson = JSON.parse(JSON.stringify(dataJson));
-    await Promise.all([
-        downloadDataFileGallery(dataJson, transformedDataJson),
-        parsePhoneNumber(dataJson, transformedDataJson),
-        mapCategoryToId(dataJson, transformedDataJson),
-        mapCityToId(dataJson, transformedDataJson),
-        mapAreaToId(dataJson, transformedDataJson),
-        mapSubareaToBusinessId(dataJson, transformedDataJson),
-        convertDateToUnixTimestamp(dataJson, transformedDataJson),
-        addMissingDefaultFields(dataJson, transformedDataJson),
-    ]);
+    try {
+        const dataJson = await openFile(RAW_DATA_DIR + filename);
+        // copied a new object out of dataJson
+        const transformedDataJson = JSON.parse(JSON.stringify(dataJson));
+        await Promise.all([
+            downloadGalleryImages(dataJson, transformedDataJson),
+            downloadThumbnailImage(dataJson, transformedDataJson),
+            parsePhoneNumber(dataJson, transformedDataJson),
+            mapCategoryToId(dataJson, transformedDataJson),
+            mapCityToId(dataJson, transformedDataJson),
+            mapAreaToId(dataJson, transformedDataJson),
+            mapSubareaToBusinessId(dataJson, transformedDataJson),
+            addMissingDefaultFields(dataJson, transformedDataJson),
+        ]);
+        await convertDateToUnixTimestamp(dataJson, transformedDataJson);
 
-    await writeFile(NORMALIZED_DATA_DIR + filename, transformedDataJson);
+        await writeFile(NORMALIZED_DATA_DIR + filename, transformedDataJson);
+    } catch (err) {
+        log.error(`Error processing file ${ filename }`);
+        log.error(err);
+    }
 }
 
 async function main() {
@@ -285,11 +331,13 @@ async function main() {
         let files;
     
         try {
-            log.info(`Scaning data directory ${RAW_DATA_DIR}`);
+            log.info(`Scaning data directory ${ RAW_DATA_DIR }`);
             files = await readdirAsync(RAW_DATA_DIR);
-            log.info(`Found ${files.length} data files.`);
+            log.info(`Found ${ files.length } data files.`);
         } catch (err) {
-            return log.error('Unable to scan directory: ' + err);
+            log.error(`Error scanning directory ${ RAW_DATA_DIR }`);
+            log.error(err);
+            return;
         }
 
         await Promise.all(files.map(filename => {
