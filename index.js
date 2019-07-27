@@ -7,7 +7,7 @@ const download = require('download');
 const jsonfile = require('jsonfile');
 const mkdirp = require('mkdirp');
 const uuid = require('uuid/v4');
-const { getTime } = require('date-fns');
+const { format, getTime } = require('date-fns');
 
 const DOWNLOAD_DIR = 'downloads/';
 const DATA_DIR = 'data/';
@@ -209,6 +209,17 @@ function convertDateToUnixTimestamp(dataJson, transformedDataJson) {
     transformedDataJson.date = unixTimestamp;
 }
 
+function addMissingDefaultFields(dataJson, transformedDataJson) {
+    const now = new Date();
+    const formattedDate = format(now, 'YYYY-MM-DD');
+    if (!dataJson.urgent_date) {
+        transformedDataJson.urgent_date = formattedDate;
+    }
+    if (!dataJson.top_date) {
+        transformedDataJson.top_date = formattedDate;
+    }
+}
+
 async function processFile(filename) {
     const dataJson = await openFile(RAW_DATA_DIR + filename);
     // copied a new object out of dataJson
@@ -220,7 +231,8 @@ async function processFile(filename) {
         mapCityToId(dataJson, transformedDataJson),
         mapAreaToId(dataJson, transformedDataJson),
         mapSubareaToBusinessId(dataJson, transformedDataJson),
-        convertDateToUnixTimestamp(dataJson, transformedDataJson)
+        convertDateToUnixTimestamp(dataJson, transformedDataJson),
+        addMissingDefaultFields(dataJson, transformedDataJson),
     ]);
 
     await writeFile(NORMALIZED_DATA_DIR + filename, transformedDataJson);
