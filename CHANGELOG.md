@@ -1,3 +1,11 @@
+### 0.6.0 (2019-07-27)
+
+##### New Features
+
+*  Rename download dir to attachs, download thumbnail image, add error handling, standardized logging ([696caf76](https://github.com/wchen02/normalizer/commit/696caf76baea76a9fc43b091e9c0dd642482fdeb))
+*  Add more default values ([81c91836](https://github.com/wchen02/normalizer/commit/81c91836af2812a57dc5245d93361b0e2c08965f))
+*  Add missing field default values ([41cb962d](https://github.com/wchen02/normalizer/commit/41cb962d8a8cb3beb4c5e383f9c1c67d3eed77a7))
+
 ### 0.5.0 (2019-07-27)
 
 ##### Breaking Changes
