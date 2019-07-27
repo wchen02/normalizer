@@ -7,6 +7,7 @@ const download = require('download');
 const jsonfile = require('jsonfile');
 const mkdirp = require('mkdirp');
 const uuid = require('uuid/v4');
+const { getTime } = require('date-fns');
 
 const DOWNLOAD_DIR = 'downloads/';
 const DATA_DIR = 'data/';
@@ -27,8 +28,8 @@ async function openFile(filename) {
 }
 
 async function writeFile(filename, dataJson) {
-    log.info(`Writing to ${filename}`)
-    log.info(`Transformed Data JSON:\n ${JSON.stringify(dataJson)}`);
+    log.info(`Writing Transformed Data JSON to ${filename}`)
+    log.info(JSON.stringify(dataJson));
     try {
         dataJson = await jsonfile.writeFile(filename, dataJson, { spaces: 2 });
     } catch (err) {
@@ -198,6 +199,16 @@ function mapSubareaToBusinessId(dataJson, transformedDataJson) {
     delete transformedDataJson.subarea;
 }
 
+function convertDateToUnixTimestamp(dataJson, transformedDataJson) {
+    if (!dataJson.date) {
+        return;
+    }
+    const date = new Date(dataJson.date);
+    const unixTimestamp = getTime(date)/1000;
+    log.info(`Converted ${dataJson.date} to ${unixTimestamp}`);
+    transformedDataJson.date = unixTimestamp;
+}
+
 async function processFile(filename) {
     const dataJson = await openFile(RAW_DATA_DIR + filename);
     // copied a new object out of dataJson
@@ -209,6 +220,7 @@ async function processFile(filename) {
         mapCityToId(dataJson, transformedDataJson),
         mapAreaToId(dataJson, transformedDataJson),
         mapSubareaToBusinessId(dataJson, transformedDataJson),
+        convertDateToUnixTimestamp(dataJson, transformedDataJson)
     ]);
 
     await writeFile(NORMALIZED_DATA_DIR + filename, transformedDataJson);
