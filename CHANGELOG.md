@@ -1,3 +1,23 @@
+### 0.5.0 (2019-07-27)
+
+##### Breaking Changes
+
+*  update data json schema ([93270ad8](https://github.com/wchen02/normalizer/commit/93270ad828f0fd1d0821f70440e7d4c223c748bb))
+
+##### Chores
+
+*  keeping normalized dir, remove example.json ([4de43212](https://github.com/wchen02/normalizer/commit/4de43212d91989b52a869f649d71a73139d5171c))
+
+##### New Features
+
+*  Parse and convert date to timestamp ([603fde0a](https://github.com/wchen02/normalizer/commit/603fde0a710b6637f31ef1eb9e95f91b91180822))
+*  map city, area, and subarea to ids ([55264aab](https://github.com/wchen02/normalizer/commit/55264aabe4fa024849a95c934a2b26a2e7a861fb))
+*  map category to category Id ([a761c5b7](https://github.com/wchen02/normalizer/commit/a761c5b795bca5fe30fd00062ebc9dc89296adee))
+
+##### Bug Fixes
+
+*  update to use the full category name ([3a288315](https://github.com/wchen02/normalizer/commit/3a2883150d5c34a36c0d5fc1408e28eba93b5525))
+
 #### 0.4.1 (2019-07-24)
 
 ##### Documentation Changes
