@@ -1,3 +1,14 @@
+## 1.0.0 (2019-07-27)
+
+##### Documentation Changes
+
+*  Prepare Readme for major release ([0717abac](https://github.com/wchen02/normalizer/commit/0717abac6a17393ef2a7a398386af77f09d9d470))
+*  Update Readme ([669a93d0](https://github.com/wchen02/normalizer/commit/669a93d0b1b4e4284af47381d2438068ebc31dd2))
+
+##### Refactors
+
+*  Move env vars from script to dotenv, updated example json ([ad3b236b](https://github.com/wchen02/normalizer/commit/ad3b236b9d636ca3a792d506c87346f1f1ce1343))
+
 ### 0.6.0 (2019-07-27)
 
 ##### New Features
