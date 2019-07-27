@@ -4,8 +4,7 @@
   "description": "Normalizes data extracted with scraper.",
   "main": "index.js",
   "scripts": {
-    "start": "DEVELOPMENT=true LOG_LEVEL=trace node index.js",
-    "start-prod": "LOG_LEVEL=warn node index.js",
+    "start": "node index.js",
     "clean": "rm -rf attachs/20* data/normalized/*",
     "test": "echo \"Error: no test specified\" && exit 1",
     "release:major": "changelog -M && git add CHANGELOG.md && git commit -m 'updated CHANGELOG.md' && npm version major && git push origin && git push origin --tags",
@@ -28,6 +27,7 @@
   },
   "dependencies": {
     "date-fns": "^1.30.1",
+    "dotenv": "^8.0.0",
     "download": "^7.1.0",
     "file-type": "^12.0.1",
     "jsonfile": "^5.0.0",

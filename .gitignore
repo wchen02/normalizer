@@ -4,3 +4,4 @@ data/*/*
 !data/normalized/.gitkeep
 attachs/*
 !attachs/.gitkeep
+.env

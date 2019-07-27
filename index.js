@@ -8,6 +8,7 @@ const jsonfile = require('jsonfile');
 const mkdirp = require('mkdirp');
 const uuid = require('uuid/v4');
 const { format, getTime } = require('date-fns');
+const dotenv = require('dotenv');
 
 const DOWNLOAD_DIR = 'attachs/';
 const DATA_DIR = 'data/';
@@ -321,6 +322,7 @@ async function processFile(filename) {
 }
 
 async function main() {
+    dotenv.config();
     log.setLevel(process.env.LOG_LEVEL);
 
     if (process.env.DEVELOPMENT) {
