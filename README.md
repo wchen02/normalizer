@@ -3,10 +3,13 @@ Normalizes data extracted with scraper. Normalizer will parse data json files an
 
 ## Features
 - Parse and download gallery images
+- Parse and download thumbnail image
 - Unique UUIDv4 image filename generation
 - Prevent malicious file downloads through image filetype detection
 - Parse phone number from details
 - Write transformed data into a separate file
+- Map location to ids
+- Add default values
 
 ## How to install
 `npm install`
