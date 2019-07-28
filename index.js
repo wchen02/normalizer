@@ -245,8 +245,12 @@ function convertDateToUnixTimestamp(dataJson, transformedDataJson) {
     }
     const date = new Date(dataJson.date);
     const unixTimestamp = getTime(date)/1000;
+
+    transformedDataJson.create_time = unixTimestamp;
+    transformedDataJson.last_time = unixTimestamp;    
     log.info(`Converted ${ dataJson.date } to ${ unixTimestamp }`);
-    transformedDataJson.date = unixTimestamp;
+
+    delete transformedDataJson.date;
 }
 
 function addMissingDefaultFields(dataJson, transformedDataJson) {
