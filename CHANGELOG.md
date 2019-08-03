@@ -1,3 +1,14 @@
+### 1.1.0 (2019-08-03)
+
+##### New Features
+
+*  Support processing data file with array of dataJson, added max concurrency configuration, normalized file are now written to unique key ([0b13e695](https://github.com/wchen02/normalizer/commit/0b13e695c2f4560f3ddc2a73a767a1a5d5fe36d7))
+*  Support pass in data file to process in development via env variable ([3ca76fae](https://github.com/wchen02/normalizer/commit/3ca76fae7a4bb2b78adefd0793941300b47c9611))
+
+##### Bug Fixes
+
+*  Forgot to convert last time ([c8800c7b](https://github.com/wchen02/normalizer/commit/c8800c7be519e5ac834779dc5a01cf95374739fa))
+
 ## 1.0.0 (2019-07-27)
 
 ##### Documentation Changes
