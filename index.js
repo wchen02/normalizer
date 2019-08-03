@@ -209,11 +209,14 @@ function mapCityToId(dataJson, transformedDataJson) {
 function mapAreaToId(dataJson, transformedDataJson) {
     const areaIdMap = {
         'Queens': 1,
+        'Flushing': 5,
         'Elmhurst': 6,
         'Brooklyn': 7,
         'Manhattan': 8,
-        'Flushing': 5,
-        'Other': 10,
+        'Bronx': 9,
+        'Staten Island': 10,
+        'Other': 11,
+        'Long Island': 12,
     }
     if (dataJson.area && areaIdMap[dataJson.area]) {
         transformedDataJson.area_id = areaIdMap[dataJson.area];
