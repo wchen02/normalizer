@@ -333,7 +333,7 @@ async function main() {
     log.setLevel(process.env.LOG_LEVEL);
 
     if (process.env.DEVELOPMENT) {
-        processFile('example.json');
+        processFile(process.env.DATA_FILE);
     } else {
         const readdirAsync = promisify(fs.readdir)
 
