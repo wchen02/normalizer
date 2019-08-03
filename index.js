@@ -327,7 +327,7 @@ async function processDataJson(dataJson) {
         await convertDateToUnixTimestamp(dataJson, transformedDataJson);
 
         const uniqueKey = await getUniqueKey(dataJson);
-        await writeFile(NORMALIZED_DATA_DIR + uniqueKey, transformedDataJson);
+        await writeFile(NORMALIZED_DATA_DIR + uniqueKey + '.json', transformedDataJson);
     } catch (err) {
         log.error(`Error processing dataJson ${ JSON.stringify(dataJson) }`);
         log.error(err);
