@@ -9,6 +9,7 @@ const mkdirp = require('mkdirp');
 const uuid = require('uuid/v4');
 const { format, getTime } = require('date-fns');
 const dotenv = require('dotenv');
+const async = require('async');
 
 const DOWNLOAD_DIR = 'attachs/';
 const DATA_DIR = 'data/';
@@ -304,11 +305,15 @@ function addMissingDefaultFields(dataJson, transformedDataJson) {
     }
 }
 
-async function processFile(filename) {
+function getUniqueKey(dataJson) {
+    return dataJson.url.toLowerCase().replace(/\W/g, '_');
+}
+
+async function processDataJson(dataJson) {
     try {
-        const dataJson = await openFile(RAW_DATA_DIR + filename);
         // copied a new object out of dataJson
         const transformedDataJson = JSON.parse(JSON.stringify(dataJson));
+
         await Promise.all([
             downloadGalleryImages(dataJson, transformedDataJson),
             downloadThumbnailImage(dataJson, transformedDataJson),
@@ -321,7 +326,24 @@ async function processFile(filename) {
         ]);
         await convertDateToUnixTimestamp(dataJson, transformedDataJson);
 
-        await writeFile(NORMALIZED_DATA_DIR + filename, transformedDataJson);
+        const uniqueKey = await getUniqueKey(dataJson);
+        await writeFile(NORMALIZED_DATA_DIR + uniqueKey, transformedDataJson);
+    } catch (err) {
+        log.error(`Error processing dataJson ${ JSON.stringify(dataJson) }`);
+        log.error(err);
+    }
+
+}
+async function processFile(filename) {
+    try {
+        const dataJson = await openFile(RAW_DATA_DIR + filename);
+        if (Array.isArray(dataJson)) {            
+            async.mapLimit(dataJson, process.env.MAX_CONCURRENCY, async (json) => {
+                await processDataJson(json);
+            });
+        } else {
+            await processDataJson(dataJson);
+        }
     } catch (err) {
         log.error(`Error processing file ${ filename }`);
         log.error(err);

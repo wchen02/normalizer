@@ -26,6 +26,7 @@
     "generate-changelog": "^1.8.0"
   },
   "dependencies": {
+    "async": "^3.1.0",
     "date-fns": "^1.30.1",
     "dotenv": "^8.0.0",
     "download": "^7.1.0",
