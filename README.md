@@ -86,11 +86,11 @@ Takes raw data JSON scraped from website and outputs normalized data JSON with i
   "date": 1564124400,
   "details": "位于法拉盛SANDFORD AVE，超近MAIN ST商业区，5分钟到7号地铁站，附近有数个大超市，全包水电网，适合单身，上班族，留学生，等等。价钱面谈，提供床架与衣柜，少煮食。\r \r 小间单房：单人$400 - 只限年轻人\r \r 有意者电：646-756-0333\r \r 短信：646-756-033",
   "gallery": [
-    "attachs/2019/07/26/4665113d-b2c8-4246-99bf-d24be223751e.jpg"
+    "attachs/2019/07/26/thumb_4665113d-b2c8-4246-99bf-d24be223751e.jpg"
   ],
   "longitude": "",
   "latitude": "",
-  "photo": "",
+  "photo": "attachs/2019/07/26/thumb_4665113d-b2c8-4246-99bf-d24be223751e.jpg",
   "contact_person": "游客",
   "contact_phone": "6467560333",
   "contact_qq": "",

@@ -10,11 +10,14 @@ const uuid = require('uuid/v4');
 const { format, getTime } = require('date-fns');
 const dotenv = require('dotenv');
 const async = require('async');
+const thumb = require('node-thumbnail').thumb;
 
 const DOWNLOAD_DIR = 'attachs/';
 const DATA_DIR = 'data/';
 const RAW_DATA_DIR = DATA_DIR + 'raw/';
 const NORMALIZED_DATA_DIR = DATA_DIR + 'normalized/';
+let LIFE_LIST_THUMBNAIL_WIDTH, LIFE_LIST_THUMBNAIL_HEIGHT;
+let LIFE_DETAIL_THUMBNAIL_WIDTH, LIFE_DETAIL_THUMBNAIL_HEIGHT;
 
 async function openFile(filename) {
     log.info(`Opening ${ filename }`)
@@ -25,13 +28,13 @@ async function openFile(filename) {
         log.error(`Error opening file: "${ filename }"`);
         log.error(err);
     }
-    log.debug(JSON.stringify(dataJson));
+    log.debug(dataJson);
     return dataJson;
 }
 
 async function writeFile(filename, dataJson) {
     log.info(`Writing Transformed Data JSON to ${ filename }`)
-    log.debug(JSON.stringify(dataJson));
+    log.debug(dataJson);
     try {
         dataJson = await jsonfile.writeFile(filename, dataJson, { spaces: 2 });
     } catch (err) {
@@ -89,8 +92,47 @@ async function downloadImage(dataJson, imgUrl) {
     return filename;
 }
 
-async function downloadThumbnailImage(dataJson, imgUrl) {
-    downloadImage(dataJson, dataJson.photo);
+async function generateThumbnailImage(imgFilename, width, height) {
+    if (!imgFilename) {
+        return;
+    }
+
+    const indexOfLastDir = imgFilename.lastIndexOf('/') + 1;
+    const imageFileDir = imgFilename.substring(0, indexOfLastDir);
+    const imgName = imgFilename.substring(indexOfLastDir);
+    const thumbnailFilename = imageFileDir + 'thumb_' + imgName;
+
+    log.info(`Generating ${ width }x${ height } thumbnail from ${ imgFilename }`);
+    try {
+        await thumb({
+            source: imgFilename,
+            prefix: 'thumb_',
+            suffix: '',
+            destination: imageFileDir,
+            width,
+            logger: function(message) {
+                log.debug(message);
+            }
+        });
+    } catch(err) {
+        log.error(`Error generating thumbnail from ${ imgFilename }`);
+        log.error(err);        
+    }
+    log.debug(`Generated thumbnail ${ thumbnailFilename }`);
+
+    return thumbnailFilename;
+}
+
+async function downloadThumbnailImage(dataJson, transformedDataJson) {
+    let thumbnailFilename;
+
+    if (dataJson.photo) {
+        const imgFilename = await downloadImage(dataJson, dataJson.photo);
+        thumbnailFilename = await generateThumbnailImage(imgFilename, LIFE_LIST_THUMBNAIL_WIDTH, LIFE_LIST_THUMBNAIL_HEIGHT);
+    } else if (transformedDataJson.gallery.length) {
+        thumbnailFilename = transformedDataJson.gallery[0];
+    }
+    transformedDataJson.photo = thumbnailFilename;
 }
 
 async function downloadGalleryImages(dataJson, transformedDataJson) {
@@ -102,9 +144,14 @@ async function downloadGalleryImages(dataJson, transformedDataJson) {
     const newGalleryPaths = await Promise.all(dataJson.gallery.map(async (imgUrl) => {
         return downloadImage(dataJson, imgUrl);
     }));
+    log.debug('Gallery images: ');
     log.debug(newGalleryPaths);
 
-    transformedDataJson.gallery = newGalleryPaths;
+    const newGalleryThumbnailPaths = await Promise.all(newGalleryPaths.map(async (imgFilename) => {
+        return generateThumbnailImage(imgFilename, LIFE_DETAIL_THUMBNAIL_WIDTH, LIFE_DETAIL_THUMBNAIL_HEIGHT);
+    }));
+
+    transformedDataJson.gallery = newGalleryThumbnailPaths;
 }
 
 async function parsePhoneNumber(dataJson, transformedDataJson) {
@@ -316,7 +363,6 @@ async function processDataJson(dataJson) {
 
         await Promise.all([
             downloadGalleryImages(dataJson, transformedDataJson),
-            downloadThumbnailImage(dataJson, transformedDataJson),
             parsePhoneNumber(dataJson, transformedDataJson),
             mapCategoryToId(dataJson, transformedDataJson),
             mapCityToId(dataJson, transformedDataJson),
@@ -324,12 +370,14 @@ async function processDataJson(dataJson) {
             mapSubareaToBusinessId(dataJson, transformedDataJson),
             addMissingDefaultFields(dataJson, transformedDataJson),
         ]);
+        await downloadThumbnailImage(dataJson, transformedDataJson);
         await convertDateToUnixTimestamp(dataJson, transformedDataJson);
 
         const uniqueKey = await getUniqueKey(dataJson);
         await writeFile(NORMALIZED_DATA_DIR + uniqueKey + '.json', transformedDataJson);
     } catch (err) {
-        log.error(`Error processing dataJson ${ JSON.stringify(dataJson) }`);
+        log.error('Error processing dataJson');
+        log.error(dataJson);
         log.error(err);
     }
 
@@ -353,7 +401,9 @@ async function processFile(filename) {
 async function main() {
     dotenv.config();
     log.setLevel(process.env.LOG_LEVEL);
-
+    [ LIFE_LIST_THUMBNAIL_WIDTH, LIFE_LIST_THUMBNAIL_HEIGHT ] = process.env.LIFE_LIST_THUMBNAIL_DIMENSION.split('x');
+    [ LIFE_DETAIL_THUMBNAIL_WIDTH, LIFE_DETAIL_THUMBNAIL_HEIGHT ] = process.env.LIFE_DETAIL_THUMBNAIL_DIMENSION.split('x');
+    
     if (process.env.DEVELOPMENT) {
         processFile(process.env.DATA_FILE);
     } else {
