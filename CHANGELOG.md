@@ -1,3 +1,9 @@
+### 1.2.0 (2019-08-11)
+
+##### New Features
+
+*  download and generate thumbnail ([95d1b627](https://github.com/wchen02/normalizer/commit/95d1b6272c461470d6fa4039164122d8d698d596))
+
 ### 1.1.0 (2019-08-03)
 
 ##### New Features
