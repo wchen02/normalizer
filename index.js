@@ -8,7 +8,6 @@ const jsonfile = require('jsonfile');
 const mkdirp = require('mkdirp');
 const uuid = require('uuid/v4');
 const { format, getTime } = require('date-fns');
-const dotenv = require('dotenv');
 const async = require('async');
 const thumb = require('node-thumbnail').thumb;
 
@@ -382,11 +381,11 @@ async function processDataJson(dataJson) {
     }
 
 }
-async function processFile(filename) {
+async function processFile(filename, maxConcurrency) {
     try {
         const dataJson = await openFile(RAW_DATA_DIR + filename);
         if (Array.isArray(dataJson)) {            
-            async.mapLimit(dataJson, process.env.MAX_CONCURRENCY, async (json) => {
+            async.mapLimit(dataJson, maxConcurrency, async (json) => {
                 await processDataJson(json);
             });
         } else {
@@ -398,14 +397,25 @@ async function processFile(filename) {
     }
 }
 
-async function main() {
-    dotenv.config();
-    log.setLevel(process.env.LOG_LEVEL);
-    [ LIFE_LIST_THUMBNAIL_WIDTH, LIFE_LIST_THUMBNAIL_HEIGHT ] = process.env.LIFE_LIST_THUMBNAIL_DIMENSION.split('x');
-    [ LIFE_DETAIL_THUMBNAIL_WIDTH, LIFE_DETAIL_THUMBNAIL_HEIGHT ] = process.env.LIFE_DETAIL_THUMBNAIL_DIMENSION.split('x');
+async function run(options) {
+    const { 
+        maxConcurrency, 
+        logLevel, 
+        lifeListThumbnail, 
+        lifeDetailThumbnail,
+        isDevelopment,
+        dataFile,
+    } = options;
+
+    log.setLevel(logLevel);
+
+    LIFE_LIST_THUMBNAIL_WIDTH = lifeListThumbnail.width;
+    LIFE_LIST_THUMBNAIL_HEIGHT = lifeListThumbnail.height;
+    LIFE_DETAIL_THUMBNAIL_WIDTH = lifeDetailThumbnail.width;
+    LIFE_DETAIL_THUMBNAIL_HEIGHT = lifeDetailThumbnail.height;
     
-    if (process.env.DEVELOPMENT) {
-        processFile(process.env.DATA_FILE);
+    if (isDevelopment) {
+        await processFile(dataFile, maxConcurrency);
     } else {
         const readdirAsync = promisify(fs.readdir)
 
@@ -422,9 +432,15 @@ async function main() {
         }
 
         await Promise.all(files.map(filename => {
-            processFile(filename);
+            processFile(filename, maxConcurrency);
         }));
     }
 }
 
-main();
+module.exports = {
+    run,
+    DOWNLOAD_DIR,
+    DATA_DIR,
+    RAW_DATA_DIR,
+    NORMALIZED_DATA_DIR,
+};
