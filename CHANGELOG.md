@@ -1,3 +1,9 @@
+### 1.4.0 (2019-08-16)
+
+##### New Features
+
+*  Add getOptions method into lib ([642c55d7](https://github.com/wchen02/normalizer/commit/642c55d7e3e95682a94bd96ef2b95ff38225ae39))
+
 ### 1.3.0 (2019-08-16)
 
 ##### Chores
