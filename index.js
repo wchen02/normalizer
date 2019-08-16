@@ -2,7 +2,7 @@ const { findNumbers } = require('libphonenumber-js');
 const fs = require('fs');
 const fileType = require('file-type');
 const log = require('loglevel');
-const { promisify } = require('util')
+const { promisify } = require('util');
 const download = require('download');
 const jsonfile = require('jsonfile');
 const mkdirp = require('mkdirp');
@@ -75,7 +75,7 @@ async function downloadImage(dataJson, imgUrl) {
     const strippedUuid = uuid().replace(/-/g, '');
     const filename = attachsDir + strippedUuid + '.' + fileDataType.ext;
     try {
-        writeFileAsync(filename, fileData);
+        await writeFileAsync(filename, fileData);
     } catch (err) {
         log.error(`Error writing file ${ filename }`);
         log.error(err);
