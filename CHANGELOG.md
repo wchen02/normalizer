@@ -1,3 +1,13 @@
+### 1.5.0 (2019-08-16)
+
+##### Chores
+
+*  remove unused env var ([4002d3fb](https://github.com/wchen02/normalizer/commit/4002d3fb8983bb1da0905b1eac24e2a733af5f03))
+
+##### New Features
+
+*  create download dir and normalized dir if not exist ([707a38ab](https://github.com/wchen02/normalizer/commit/707a38abceca8e612f4a14439998348c9099c16c))
+
 #### 1.4.1 (2019-08-16)
 
 ##### Bug Fixes
