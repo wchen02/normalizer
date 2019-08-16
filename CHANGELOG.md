@@ -1,3 +1,13 @@
+### 1.3.0 (2019-08-16)
+
+##### Chores
+
+*  update example .env ([4a48af18](https://github.com/wchen02/normalizer/commit/4a48af18fda1af9e3edb189dba48610cab4acb94))
+
+##### New Features
+
+*  Make directories configurable vai env var ([1c674eac](https://github.com/wchen02/normalizer/commit/1c674eacac02f185d66cc2c922e0ba6986a0de17))
+
 ### 1.2.0 (2019-08-11)
 
 ##### New Features
