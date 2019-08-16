@@ -1,3 +1,9 @@
+#### 1.5.1 (2019-08-16)
+
+##### Bug Fixes
+
+*  add missing await when writing download image into disk ([9ec67eee](https://github.com/wchen02/normalizer/commit/9ec67eeec31c18be39736fc02dc4fed4f2b13dd8))
+
 ### 1.5.0 (2019-08-16)
 
 ##### Chores
