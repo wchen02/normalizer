@@ -19,6 +19,12 @@ function main() {
         },
         isDevelopment: process.env.DEVELOPMENT,
         dataFile: process.env.DATA_FILE,
+        dir: {
+            download: process.env.DOWNLOAD_DIR,
+            data: process.env.DATA_DIR,
+            rawData: process.env.RAW_DATA_DIR,
+            normalizedData: process.env.NORMALIZED_DATA_DIR,
+        }
     }
 
     normalizer.run(options);

@@ -11,10 +11,10 @@ const { format, getTime } = require('date-fns');
 const async = require('async');
 const thumb = require('node-thumbnail').thumb;
 
-const DOWNLOAD_DIR = 'attachs/';
-const DATA_DIR = 'data/';
-const RAW_DATA_DIR = DATA_DIR + 'raw/';
-const NORMALIZED_DATA_DIR = DATA_DIR + 'normalized/';
+let DOWNLOAD_DIR;
+let DATA_DIR;
+let RAW_DATA_DIR;
+let NORMALIZED_DATA_DIR;
 let LIFE_LIST_THUMBNAIL_WIDTH, LIFE_LIST_THUMBNAIL_HEIGHT;
 let LIFE_DETAIL_THUMBNAIL_WIDTH, LIFE_DETAIL_THUMBNAIL_HEIGHT;
 
@@ -405,10 +405,15 @@ async function run(options) {
         lifeDetailThumbnail,
         isDevelopment,
         dataFile,
+        dir,
     } = options;
 
     log.setLevel(logLevel);
 
+    DOWNLOAD_DIR = dir.download;
+    DATA_DIR = dir.data;
+    RAW_DATA_DIR = dir.rawData;
+    NORMALIZED_DATA_DIR = dir.normalizedData;
     LIFE_LIST_THUMBNAIL_WIDTH = lifeListThumbnail.width;
     LIFE_LIST_THUMBNAIL_HEIGHT = lifeListThumbnail.height;
     LIFE_DETAIL_THUMBNAIL_WIDTH = lifeDetailThumbnail.width;
