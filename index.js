@@ -12,7 +12,6 @@ const async = require('async');
 const thumb = require('node-thumbnail').thumb;
 
 let DOWNLOAD_DIR;
-let DATA_DIR;
 let RAW_DATA_DIR;
 let NORMALIZED_DATA_DIR;
 let LIFE_LIST_THUMBNAIL_WIDTH, LIFE_LIST_THUMBNAIL_HEIGHT;
