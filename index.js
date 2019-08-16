@@ -11,12 +11,6 @@ const { format, getTime } = require('date-fns');
 const async = require('async');
 const thumb = require('node-thumbnail').thumb;
 
-let DOWNLOAD_DIR;
-let RAW_DATA_DIR;
-let NORMALIZED_DATA_DIR;
-let LIFE_LIST_THUMBNAIL_WIDTH, LIFE_LIST_THUMBNAIL_HEIGHT;
-let LIFE_DETAIL_THUMBNAIL_WIDTH, LIFE_DETAIL_THUMBNAIL_HEIGHT;
-
 async function openFile(filename) {
     log.info(`Opening ${ filename }`)
     let dataJson;
@@ -43,7 +37,7 @@ async function writeFile(filename, dataJson) {
     return dataJson;
 }
 
-async function downloadImage(dataJson, imgUrl) {
+async function downloadImage(dataJson, imgUrl, options) {
     if (!imgUrl) {
         return;
     }
@@ -53,7 +47,7 @@ async function downloadImage(dataJson, imgUrl) {
     const month = format(date, 'MM');
     const day = format(date, 'DD');
 
-    const attachsDir = DOWNLOAD_DIR + year + '/' + month + '/' + day + '/';
+    const attachsDir = options.dir.download + year + '/' + month + '/' + day + '/';
     makeDirectories(attachsDir);
     
     log.info(`Download image ${ imgUrl }`);
@@ -116,32 +110,32 @@ async function generateThumbnailImage(imgFilename, width, height) {
     return thumbnailFilename;
 }
 
-async function downloadThumbnailImage(dataJson, transformedDataJson) {
+async function downloadThumbnailImage(dataJson, transformedDataJson, options) {
     let thumbnailFilename;
 
     if (dataJson.photo) {
-        const imgFilename = await downloadImage(dataJson, dataJson.photo);
-        thumbnailFilename = await generateThumbnailImage(imgFilename, LIFE_LIST_THUMBNAIL_WIDTH, LIFE_LIST_THUMBNAIL_HEIGHT);
+        const imgFilename = await downloadImage(dataJson, dataJson.photo, options);
+        thumbnailFilename = await generateThumbnailImage(imgFilename, options.lifeListThumbnail.width, options.lifeListThumbnail.height);
     } else if (transformedDataJson.gallery.length) {
         thumbnailFilename = transformedDataJson.gallery[0];
     }
     transformedDataJson.photo = thumbnailFilename;
 }
 
-async function downloadGalleryImages(dataJson, transformedDataJson) {
+async function downloadGalleryImages(dataJson, transformedDataJson, options) {
     if (!dataJson.gallery.length) {
         return;
     }
 
     log.info(`Found ${ dataJson.gallery.length } gallery images`);
     const newGalleryPaths = await Promise.all(dataJson.gallery.map(async (imgUrl) => {
-        return downloadImage(dataJson, imgUrl);
+        return downloadImage(dataJson, imgUrl, options);
     }));
     log.debug('Gallery images: ');
     log.debug(newGalleryPaths);
 
     const newGalleryThumbnailPaths = await Promise.all(newGalleryPaths.map(async (imgFilename) => {
-        return generateThumbnailImage(imgFilename, LIFE_DETAIL_THUMBNAIL_WIDTH, LIFE_DETAIL_THUMBNAIL_HEIGHT);
+        return generateThumbnailImage(imgFilename, options.lifeDetailThumbnail.width, options.lifeDetailThumbnail.height);
     }));
 
     transformedDataJson.gallery = newGalleryThumbnailPaths;
@@ -349,13 +343,13 @@ function getUniqueKey(dataJson) {
     return dataJson.url.toLowerCase().replace(/\W/g, '_');
 }
 
-async function processDataJson(dataJson) {
+async function processDataJson(dataJson, options) {
     try {
         // copied a new object out of dataJson
         const transformedDataJson = JSON.parse(JSON.stringify(dataJson));
 
         await Promise.all([
-            downloadGalleryImages(dataJson, transformedDataJson),
+            downloadGalleryImages(dataJson, transformedDataJson, options),
             parsePhoneNumber(dataJson, transformedDataJson),
             mapCategoryToId(dataJson, transformedDataJson),
             mapCityToId(dataJson, transformedDataJson),
@@ -363,11 +357,11 @@ async function processDataJson(dataJson) {
             mapSubareaToBusinessId(dataJson, transformedDataJson),
             addMissingDefaultFields(dataJson, transformedDataJson),
         ]);
-        await downloadThumbnailImage(dataJson, transformedDataJson);
+        await downloadThumbnailImage(dataJson, transformedDataJson, options);
         await convertDateToUnixTimestamp(dataJson, transformedDataJson);
 
         const uniqueKey = await getUniqueKey(dataJson);
-        await writeFile(NORMALIZED_DATA_DIR + uniqueKey + '.json', transformedDataJson);
+        await writeFile(options.dir.normalizedData + uniqueKey + '.json', transformedDataJson);
     } catch (err) {
         log.error('Error processing dataJson');
         log.error(dataJson);
@@ -375,15 +369,15 @@ async function processDataJson(dataJson) {
     }
 
 }
-async function processFile(filename, maxConcurrency) {
+async function processFile(filename, options) {
     try {
-        const dataJson = await openFile(RAW_DATA_DIR + filename);
+        const dataJson = await openFile(options.dir.rawData + filename);
         if (Array.isArray(dataJson)) {            
-            async.mapLimit(dataJson, maxConcurrency, async (json) => {
-                await processDataJson(json);
+            async.mapLimit(dataJson, options.maxConcurrency, async (json) => {
+                await processDataJson(json, options);
             });
         } else {
-            await processDataJson(dataJson);
+            await processDataJson(dataJson, options);
         }
     } catch (err) {
         log.error(`Error processing file ${ filename }`);
@@ -405,10 +399,7 @@ function makeDirectories(dir) {
 
 async function run(options) {
     const { 
-        maxConcurrency, 
         logLevel, 
-        lifeListThumbnail, 
-        lifeDetailThumbnail,
         isDevelopment,
         dataFile,
         dir,
@@ -416,33 +407,28 @@ async function run(options) {
 
     log.setLevel(logLevel);
 
-    DOWNLOAD_DIR = makeDirectories(dir.download);
-    RAW_DATA_DIR = dir.rawData;
-    NORMALIZED_DATA_DIR = makeDirectories(dir.normalizedData);
-    LIFE_LIST_THUMBNAIL_WIDTH = lifeListThumbnail.width;
-    LIFE_LIST_THUMBNAIL_HEIGHT = lifeListThumbnail.height;
-    LIFE_DETAIL_THUMBNAIL_WIDTH = lifeDetailThumbnail.width;
-    LIFE_DETAIL_THUMBNAIL_HEIGHT = lifeDetailThumbnail.height;
+    makeDirectories(dir.download);
+    makeDirectories(dir.normalizedData);
     
     if (isDevelopment) {
-        await processFile(dataFile, maxConcurrency);
+        await processFile(dataFile, options);
     } else {
         const readdirAsync = promisify(fs.readdir)
 
         let files;
     
         try {
-            log.info(`Scaning data directory ${ RAW_DATA_DIR }`);
-            files = await readdirAsync(RAW_DATA_DIR);
+            log.info(`Scaning data directory ${ dir.rawData }`);
+            files = await readdirAsync(dir.rawData);
             log.info(`Found ${ files.length } data files.`);
         } catch (err) {
-            log.error(`Error scanning directory ${ RAW_DATA_DIR }`);
+            log.error(`Error scanning directory ${ dir.rawData }`);
             log.error(err);
             return;
         }
 
         await Promise.all(files.map(filename => {
-            processFile(filename, maxConcurrency);
+            processFile(filename, options);
         }));
     }
 }
