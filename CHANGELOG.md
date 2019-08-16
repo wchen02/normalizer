@@ -1,3 +1,9 @@
+#### 1.4.1 (2019-08-16)
+
+##### Bug Fixes
+
+*  long attach file name causing loader to not able to safe to db ([e45801be](https://github.com/wchen02/normalizer/commit/e45801be983c1eb5a1fbed43ec20287ca6ed6744))
+
 ### 1.4.0 (2019-08-16)
 
 ##### New Features
