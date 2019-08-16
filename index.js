@@ -442,10 +442,33 @@ async function run(options) {
     }
 }
 
+function getOptions(options) {
+    const [ LIFE_LIST_THUMBNAIL_WIDTH, LIFE_LIST_THUMBNAIL_HEIGHT ] = options.LIFE_LIST_THUMBNAIL_DIMENSION.split('x');
+    const [ LIFE_DETAIL_THUMBNAIL_WIDTH, LIFE_DETAIL_THUMBNAIL_HEIGHT ] = options.LIFE_DETAIL_THUMBNAIL_DIMENSION.split('x');
+
+    return {
+        maxConcurrency: options.MAX_CONCURRENCY,
+        logLevel: options.LOG_LEVEL,
+        lifeListThumbnail: {
+            width: LIFE_LIST_THUMBNAIL_WIDTH,
+            height: LIFE_LIST_THUMBNAIL_HEIGHT,
+        },
+        lifeDetailThumbnail: {
+            width: LIFE_DETAIL_THUMBNAIL_WIDTH,
+            height: LIFE_DETAIL_THUMBNAIL_HEIGHT,
+        },
+        isDevelopment: options.DEVELOPMENT,
+        dataFile: options.DATA_FILE,
+        dir: {
+            download: options.DOWNLOAD_DIR,
+            data: options.DATA_DIR,
+            rawData: options.RAW_DATA_DIR,
+            normalizedData: options.NORMALIZED_DATA_DIR,
+        }
+    }
+}
+
 module.exports = {
     run,
-    DOWNLOAD_DIR,
-    DATA_DIR,
-    RAW_DATA_DIR,
-    NORMALIZED_DATA_DIR,
+    getOptions,
 };
