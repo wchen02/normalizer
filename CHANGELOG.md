@@ -1,3 +1,9 @@
+#### 1.5.2 (2019-08-16)
+
+##### Refactors
+
+*  Refactor to remove global variables and move dependencies to the method signature ([963fa87d](https://github.com/wchen02/normalizer/commit/963fa87d7b5cec36dd674747be53fd48ab645448))
+
 #### 1.5.1 (2019-08-16)
 
 ##### Bug Fixes
