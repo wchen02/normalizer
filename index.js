@@ -79,7 +79,8 @@ async function downloadImage(dataJson, imgUrl) {
     }
 
     const writeFileAsync = promisify(fs.writeFile);
-    const filename = attachsDir + uuid() + '.' + fileDataType.ext;
+    const strippedUuid = uuid().replace(/-/g, '');
+    const filename = attachsDir + strippedUuid + '.' + fileDataType.ext;
     try {
         writeFileAsync(filename, fileData);
     } catch (err) {
