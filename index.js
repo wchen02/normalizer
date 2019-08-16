@@ -54,13 +54,7 @@ async function downloadImage(dataJson, imgUrl) {
     const day = format(date, 'DD');
 
     const attachsDir = DOWNLOAD_DIR + year + '/' + month + '/' + day + '/';
-    log.info(`Making directory ${ attachsDir }`);
-    try {
-        mkdirp.sync(attachsDir);
-    } catch (err) {
-        log.error(`Error to make dir ${ attachsDir }`);
-        log.error(err);
-    }
+    makeDirectories(attachsDir);
     
     log.info(`Download image ${ imgUrl }`);
     let fileData;
@@ -397,6 +391,18 @@ async function processFile(filename, maxConcurrency) {
     }
 }
 
+function makeDirectories(dir) {
+    log.info(`Making directory ${ dir }`);
+    try {
+        mkdirp.sync(dir);
+    } catch (err) {
+        log.error(`Error to make dir ${ dir }`);
+        log.error(err);
+    }
+
+    return dir;
+}
+
 async function run(options) {
     const { 
         maxConcurrency, 
@@ -410,10 +416,9 @@ async function run(options) {
 
     log.setLevel(logLevel);
 
-    DOWNLOAD_DIR = dir.download;
-    DATA_DIR = dir.data;
+    DOWNLOAD_DIR = makeDirectories(dir.download);
     RAW_DATA_DIR = dir.rawData;
-    NORMALIZED_DATA_DIR = dir.normalizedData;
+    NORMALIZED_DATA_DIR = makeDirectories(dir.normalizedData);
     LIFE_LIST_THUMBNAIL_WIDTH = lifeListThumbnail.width;
     LIFE_LIST_THUMBNAIL_HEIGHT = lifeListThumbnail.height;
     LIFE_DETAIL_THUMBNAIL_WIDTH = lifeDetailThumbnail.width;
