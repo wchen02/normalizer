@@ -1,7 +1,8 @@
 node_modules/
-data/*/*
-!data/raw/example.json
-!data/normalized/.gitkeep
+raw/*
+!raw/example.json
+normalized/*
+!normalized/.gitkeep
 attachs/*
 !attachs/.gitkeep
 .env

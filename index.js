@@ -47,7 +47,7 @@ async function downloadImage(dataJson, imgUrl, options) {
     const month = format(date, 'MM');
     const day = format(date, 'DD');
 
-    const attachsDir = options.dir.download + year + '/' + month + '/' + day + '/';
+    const attachsDir = options.dir.download + '/' + year + '/' + month + '/' + day + '/';
     makeDirectories(attachsDir);
     
     log.info(`Download image ${ imgUrl }`);
@@ -361,7 +361,7 @@ async function processDataJson(dataJson, options) {
         await convertDateToUnixTimestamp(dataJson, transformedDataJson);
 
         const uniqueKey = await getUniqueKey(dataJson);
-        await writeFile(options.dir.normalizedData + uniqueKey + '.json', transformedDataJson);
+        await writeFile(options.dir.normalizedData + '/' + uniqueKey + '.json', transformedDataJson);
     } catch (err) {
         log.error('Error processing dataJson');
         log.error(dataJson);
@@ -371,7 +371,7 @@ async function processDataJson(dataJson, options) {
 }
 async function processFile(filename, options) {
     try {
-        const dataJson = await openFile(options.dir.rawData + filename);
+        const dataJson = await openFile(options.dir.rawData + '/' + filename);
         if (Array.isArray(dataJson)) {            
             async.mapLimit(dataJson, options.maxConcurrency, async (json) => {
                 await processDataJson(json, options);
@@ -434,19 +434,16 @@ async function run(options) {
 }
 
 function getOptions(options) {
-    const [ LIFE_LIST_THUMBNAIL_WIDTH, LIFE_LIST_THUMBNAIL_HEIGHT ] = options.LIFE_LIST_THUMBNAIL_DIMENSION.split('x');
-    const [ LIFE_DETAIL_THUMBNAIL_WIDTH, LIFE_DETAIL_THUMBNAIL_HEIGHT ] = options.LIFE_DETAIL_THUMBNAIL_DIMENSION.split('x');
-
     return {
         maxConcurrency: options.MAX_CONCURRENCY,
         logLevel: options.LOG_LEVEL,
         lifeListThumbnail: {
-            width: LIFE_LIST_THUMBNAIL_WIDTH,
-            height: LIFE_LIST_THUMBNAIL_HEIGHT,
+            width: options.LIFE_LIST_THUMBNAIL_WIDTH,
+            height: options.LIFE_LIST_THUMBNAIL_HEIGHT,
         },
         lifeDetailThumbnail: {
-            width: LIFE_DETAIL_THUMBNAIL_WIDTH,
-            height: LIFE_DETAIL_THUMBNAIL_HEIGHT,
+            width: options.LIFE_DETAIL_THUMBNAIL_WIDTH,
+            height: options.LIFE_DETAIL_THUMBNAIL_HEIGHT,
         },
         isDevelopment: options.DEVELOPMENT,
         dataFile: options.DATA_FILE,
