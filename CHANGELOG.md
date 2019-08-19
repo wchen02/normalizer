@@ -1,3 +1,9 @@
+#### 1.5.3 (2019-08-19)
+
+##### Refactors
+
+*  Refactor dir env to work with or without ending '/' ([24fe5b24](https://github.com/wchen02/normalizer/commit/24fe5b2422cfa508b8ccb6a064d46e9696c260fe))
+
 #### 1.5.2 (2019-08-16)
 
 ##### Refactors
