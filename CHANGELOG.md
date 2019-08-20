@@ -1,3 +1,9 @@
+#### 1.5.4 (2019-08-20)
+
+##### Other Changes
+
+* **options:**  dropped data env var ([7703fef5](https://github.com/wchen02/normalizer/commit/7703fef560f4997bbb61c325ad4394c8cb7fbff1))
+
 #### 1.5.3 (2019-08-19)
 
 ##### Refactors
