@@ -449,7 +449,6 @@ function getOptions(options) {
         dataFile: options.DATA_FILE,
         dir: {
             download: options.DOWNLOAD_DIR,
-            data: options.DATA_DIR,
             rawData: options.RAW_DATA_DIR,
             normalizedData: options.NORMALIZED_DATA_DIR,
         }
