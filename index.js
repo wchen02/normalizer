@@ -373,7 +373,7 @@ async function processFile(filename, options) {
     try {
         const dataJson = await openFile(options.dir.rawData + '/' + filename);
         if (Array.isArray(dataJson)) {            
-            async.mapLimit(dataJson, options.maxConcurrency, async (json) => {
+            await async.mapLimit(dataJson, options.maxConcurrency, async (json) => {
                 await processDataJson(json, options);
             });
         } else {
