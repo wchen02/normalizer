@@ -1,3 +1,9 @@
+#### 1.5.5 (2019-08-25)
+
+##### Bug Fixes
+
+*  Fix bug that load and archives files before all data json are normalized ([62ddff9c](https://github.com/wchen02/normalizer/commit/62ddff9cf122541d0230e3a3fa896636713ea309))
+
 #### 1.5.4 (2019-08-20)
 
 ##### Other Changes
