@@ -30,7 +30,7 @@ async function writeFile(filename, dataJson) {
     try {
         dataJson = await jsonfile.writeFile(filename, dataJson, { spaces: 2 });
     } catch (err) {
-        log.error(`Error writting to file: "${ filename }"`);
+        log.error(`Error writing to file: "${ filename }"`);
         log.error(err);
     }
     log.debug('Done');
@@ -418,7 +418,7 @@ async function run(options) {
         let files;
     
         try {
-            log.info(`Scaning data directory ${ dir.rawData }`);
+            log.info(`Scanning data directory ${ dir.rawData }`);
             files = await readdirAsync(dir.rawData);
             log.info(`Found ${ files.length } data files.`);
         } catch (err) {
