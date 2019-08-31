@@ -1,3 +1,13 @@
+#### 1.5.6 (2019-08-31)
+
+##### Chores
+
+*  Update package ([f4069261](https://github.com/wchen02/normalizer/commit/f4069261e3e584c3e9de715f9305235e37842ffc))
+
+##### Other Changes
+
+*  fix typos in code ([c548519e](https://github.com/wchen02/normalizer/commit/c548519e83fe1f59f8061c527392114a94e7c858))
+
 #### 1.5.5 (2019-08-25)
 
 ##### Bug Fixes
