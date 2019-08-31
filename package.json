@@ -1,6 +1,6 @@
 {
   "name": "normalizer",
-  "version": "1.5.5",
+  "version": "1.5.6",
   "description": "Normalizes data extracted with scraper.",
   "main": "index.js",
   "scripts": {
