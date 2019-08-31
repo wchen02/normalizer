@@ -22,20 +22,20 @@
   },
   "homepage": "https://github.com/wchen02/normalizer#readme",
   "devDependencies": {
-    "eslint": "^6.1.0",
+    "eslint": "^6.3.0",
     "generate-changelog": "^1.8.0"
   },
   "dependencies": {
     "async": "^3.1.0",
     "date-fns": "^1.30.1",
-    "dotenv": "^8.0.0",
+    "dotenv": "^8.1.0",
     "download": "^7.1.0",
-    "file-type": "^12.0.1",
+    "file-type": "^12.2.0",
     "jsonfile": "^5.0.0",
-    "libphonenumber-js": "^1.7.21",
+    "libphonenumber-js": "^1.7.23",
     "loglevel": "^1.6.3",
     "mkdirp": "^0.5.1",
     "node-thumbnail": "^0.15.0",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.3"
   }
 }
